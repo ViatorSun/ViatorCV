@@ -9,12 +9,8 @@
 
 
 
-
 import torch.nn as nn
 import math
-
-
-
 
 
 
@@ -121,11 +117,11 @@ class MobileNetV2(nn.Module):
         # make it nn.Sequential
         self.features = nn.Sequential(*self.features)
         
-        #张昊添加：原本不存在这一层，在forward函数中是取均值x = x.mean(3).mean(2)，但是转出onnx模型后opencv不支持，故修改为卷积操作
-        #但是！！！ 这一个1280的卷积操作，直接让模型权重从不到10M扩大到了500M！！！！！！
+        # 原本不存在这一层，在forward函数中是取均值x = x.mean(3).mean(2)，但是转出onnx模型后opencv不支持，故修改为卷积操作
+        # 但是！！！ 这一个1280的卷积操作，直接让模型权重从不到10M扩大到了500M！！！！！！
         #self.zhanghaoLayer1 = nn.Conv2d(self.last_channel, self.last_channel, 7, 1, 0)
         
-        # self.avgpool：张昊添加的，将x.mean(3).mean(2)替换为一个平均池化层
+        # self.avgpool：将x.mean(3).mean(2)替换为一个平均池化层
         # self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.avgpool = nn.AvgPool2d(7, stride=1)
         
@@ -138,8 +134,8 @@ class MobileNetV2(nn.Module):
         x = self.features(x)
         #x = x.mean(3).mean(2)
         
-        # zhanghaoLayer1 太大了，不可用
-        #x = self.zhanghaoLayer1(x)
+        # Layer1 太大了，不可用
+        #x = self.Layer1(x)
         #x = x.view(1, self.last_channel) 
         
         x = self.avgpool(x)
