@@ -8,10 +8,8 @@
 
 
 
-
-import torch.nn as nn
 import math
-
+import torch.nn as nn
 
 
 
@@ -19,16 +17,14 @@ def conv_bn(inp, oup, stride):
     return nn.Sequential(   nn.Conv2d(inp, oup, kernel_size=3, stride=stride, padding_mode=1, bias=False),
                             nn.BatchNorm2d(oup),
                             nn.ReLU()
-                            #nn.ReLU6(inplace=True)
-                        )
+                            #nn.ReLU6(inplace=True)     )
 
 
 def conv_1x1_bn(inp, oup):
     return nn.Sequential(   nn.Conv2d(inp, oup, kernel_size=1, stride=1, padding_mode=0, bias=False),
                             nn.BatchNorm2d(oup),
                             nn.ReLU()
-                            #nn.ReLU6(inplace=True)
-                        )
+                            #nn.ReLU6(inplace=True)     )
 
 
 
@@ -52,21 +48,25 @@ class InvertedResidual(nn.Module):
         self.use_res_connect = self.stride == 1 and inp == oup
 
         if expand_ratio == 1:
-            self.conv = nn.Sequential(  nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),     # dw
+            self.conv = nn.Sequential(  # dw
+                                        nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),     
                                         nn.BatchNorm2d(hidden_dim),
                                         nn.ReLU(),
-                                        #nn.ReLU6(inplace=True)
+                                        # nn.ReLU6(inplace=True)
                                         # pw-linear
                                         nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
                                         nn.BatchNorm2d(oup)     )
         else:
-            self.conv = nn.Sequential(  nn.Conv2d(inp, hidden_dim, 1, 1, 0, bias=False),        # pw
+            self.conv = nn.Sequential(  # dw
+                                        nn.Conv2d(inp, hidden_dim, 1, 1, 0, bias=False),
                                         nn.BatchNorm2d(hidden_dim),
-                                        nn.ReLU(),    #nn.ReLU6(inplace=True)
+                                        nn.ReLU(),    
+                                        # nn.ReLU6(inplace=True)
                                         # dw
                                         nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
                                         nn.BatchNorm2d(hidden_dim),
-                                        nn.ReLU(),    #nn.ReLU6(inplace=True)
+                                        nn.ReLU(),    
+                                        # nn.ReLU6(inplace=True)
                                         # pw-linear
                                         nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
                                         nn.BatchNorm2d(oup)     )
@@ -87,7 +87,7 @@ class MobileNetV2(nn.Module):
         block         = InvertedResidual
         input_channel = 32
         last_channel  = 1280
-        interverted_residual_setting = [#t, c, n, s
+        interverted_residual_setting = [# t, c, n, s
                                         [1, 16, 1, 1],
                                         [6, 24, 2, 2],
                                         [6, 32, 3, 2],
@@ -98,7 +98,7 @@ class MobileNetV2(nn.Module):
 
         # building first layer
         assert input_size % 32 == 0
-        # input_channel = make_divisible(input_channel * width_mult)  # first channel is always 32!
+        # input_channel   = make_divisible(input_channel * width_mult)  # first channel is always 32!
         self.last_channel = make_divisible(last_channel * width_mult) if width_mult > 1.0 else last_channel
         self.features = [conv_bn(3, input_channel, 2)]
 
@@ -119,7 +119,7 @@ class MobileNetV2(nn.Module):
         
         # 原本不存在这一层，在forward函数中是取均值x = x.mean(3).mean(2)，但是转出onnx模型后opencv不支持，故修改为卷积操作
         # 但是！！！ 这一个1280的卷积操作，直接让模型权重从不到10M扩大到了500M！！！！！！
-        #self.zhanghaoLayer1 = nn.Conv2d(self.last_channel, self.last_channel, 7, 1, 0)
+        # self.Layer1 = nn.Conv2d(self.last_channel, self.last_channel, 7, 1, 0)
         
         # self.avgpool：将x.mean(3).mean(2)替换为一个平均池化层
         # self.avgpool = nn.AdaptiveAvgPool2d(1)
@@ -135,8 +135,8 @@ class MobileNetV2(nn.Module):
         #x = x.mean(3).mean(2)
         
         # Layer1 太大了，不可用
-        #x = self.Layer1(x)
-        #x = x.view(1, self.last_channel) 
+        # x = self.Layer1(x)
+        # x = x.view(1, self.last_channel) 
         
         x = self.avgpool(x)
         x = x.view(-1, self.last_channel)
