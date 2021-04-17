@@ -1,6 +1,6 @@
 #  !/usr/bin/env  python
 #  -*- coding:utf-8 -*-
-# @Time   :  2020.10
+# @Time   :  2021.4
 # @Author :  绿色羽毛
 # @Email  :  lvseyumao@foxmail.com
 # @Blog   :  https://blog.csdn.net/ViatorSun
@@ -24,10 +24,10 @@ class BasicBlock(nn.Module):
         :param stride:      步长
         """
         super().__init__()
-        self.conv1     = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv1     = nn.Conv2d(in_planes, planes, kernel_size=(3,3), stride=stride, padding=(1,1), bias=False)
         self.bn1       = nn.BatchNorm2d(planes)
 
-        self.conv2     = nn.Conv2d(planes   , planes, kernel_size=3, stride=1     , padding=1, bias=False)
+        self.conv2     = nn.Conv2d(planes   , planes, kernel_size=(3,3), stride=(1,1) , padding=(1,1), bias=False)
         self.bn2       = nn.BatchNorm2d(planes)
 
         self.shortcut  = nn.Sequential()
@@ -35,7 +35,7 @@ class BasicBlock(nn.Module):
         # 经过处理后的 x 要与 x 的维度相同(尺寸和深度)
         # 如果不相同，需要添加卷积+BN来变换为同一维度
         if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential( nn.Conv2d(in_planes, self.expansion * planes, kernel_size=1, stride=stride, bias=False),
+            self.shortcut = nn.Sequential( nn.Conv2d(in_planes, self.expansion * planes, kernel_size=(1,1), stride=stride, bias=False),
                                            nn.BatchNorm2d(self.expansion * planes)  )
 
     def forward(self, x):
@@ -59,19 +59,19 @@ class Bottleneck(nn.Module):
         :param stride:
         """
         super().__init__()
-        self.conv1    = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False )
+        self.conv1    = nn.Conv2d(in_planes, planes, kernel_size=(1,1), bias=False )
         self.bn1      = nn.BatchNorm2d(planes)
 
-        self.conv2    = nn.Conv2d(planes   , planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.conv2    = nn.Conv2d(planes   , planes, kernel_size=(3,3), stride=stride, padding=(1,1), bias=False)
         self.bn2      = nn.BatchNorm2d(planes)
 
-        self.conv3    = nn.Conv2d(planes, self.expansion * planes, kernel_size=1, bias=False)
+        self.conv3    = nn.Conv2d(planes, self.expansion * planes, kernel_size=(1,1), bias=False)
         self.bn3      = nn.BatchNorm2d(self.expansion * planes)
 
         self.shortcut = nn.Sequential()
 
         if stride != 1 or in_planes != self.expansion * planes:
-            self.shortcut = nn.Sequential( nn.Conv2d(in_planes, self.expansion * planes,kernel_size=1, stride=stride, bias=False),
+            self.shortcut = nn.Sequential( nn.Conv2d(in_planes, self.expansion * planes,kernel_size=(1,1), stride=stride, bias=False),
                                            nn.BatchNorm2d(self.expansion * planes)  )
 
     def forward(self, x):
@@ -95,7 +95,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         self.in_planes = 64
 
-        self.conv1  = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
+        self.conv1  = nn.Conv2d(3, 64, kernel_size=(3,3), stride=(1,1), padding=(1,1), bias=False)
         self.bn1    = nn.BatchNorm2d(64)
         self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
         self.layer2 = self._make_layer(block, 128, num_blocks[1], stride=2)
@@ -156,8 +156,8 @@ def ResNet152():
 
 
 
-# if __name__ == '__main__':
-#     net = ResNet18()
-#     print(net)
+if __name__ == '__main__':
+    net = ResNet18()
+    print(net)
 
 
