@@ -11,8 +11,7 @@
 
 '''
 MobileNetV3 in PyTorch.
-See the paper "Inverted Residuals and Linear Bottlenecks:
-Mobile Networks for Classification, Detection and Segmentation" for more details.
+See the paper "MobileNetV2：Inverted Residuals and Linear Bottlenecks" for more details.
 '''
 
 
