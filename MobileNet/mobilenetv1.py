@@ -32,11 +32,11 @@ class MobileNet(nn.Module):
                                     nn.ReLU(inplace=True)   )
 
         def conv_dw(inp, oup, stride):
-            return nn.Sequential(   nn.Conv2d(inp, inp, kernel_size=3, stride=stride, padding_mode=1, groups=inp, bias=False),      # depthwise卷积
+            return nn.Sequential(   nn.Conv2d(inp, inp, kernel_size=(3,3), stride=stride, padding_mode='reflect', groups=inp, bias=False),  # depthwise卷积
                                     nn.BatchNorm2d(inp),
                                     nn.ReLU(inplace=True),
 
-                                    nn.Conv2d(inp, oup, kernel_size=1, stride=1,      padding_mode=0, bias=False),
+                                    nn.Conv2d(inp, oup, kernel_size=(1,1), stride=(1,1),  padding_mode='zeros', bias=False),                # pointwise卷积
                                     nn.BatchNorm2d(oup),
                                     nn.ReLU(inplace=True)   )
 
@@ -93,6 +93,7 @@ if __name__ == '__main__':
     vgg16      = models.vgg16(num_classes=2).cuda()
     squeezenet = models.squeezenet1_0(num_classes=2).cuda()
     mobilenet  = MobileNet().cuda()
+    # print(mobilenet)
 
     speed(resnet18  , 'resnet18')
     speed(alexnet   , 'alexnet')
